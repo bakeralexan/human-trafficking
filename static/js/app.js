@@ -1,7 +1,3 @@
-// const countyURL = "Resources/county.geojson";
-const countyURL = "https://raw.githubusercontent.com/zeke/us-counties/master/county.geo.json";
-
-
 const street= L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token={accessToken}', {
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery (c) <a href="https://www.mapbox.com/">Mapbox</a>',
     maxZoom: 18,
@@ -13,67 +9,40 @@ const satellite = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/satellite
     accessToken: API_KEY
 });
 
-let countyLines = L.layerGroup([]);
-// Create a map object, and set the default layers.
+let countyData = L.layerGroup([]);
+
 const myMap = L.map("map", {
     center: [35.0902, -105.7129],
     zoom: 4,
     layers: [street]
 });
-d3.json(countyURL).then(function createCounty(response) {
-    L.geoJson(response).addTo(countyLine);
-    let features = response.features;
+let countyLines = L.layerGroup([]);
+async function dataLoad() {
+    const dataset = await d3.json("Resources/county.geo.json").then(function (response) {
+         L.geoJson(response).addTo(countyLines);
+        // let features = response.features;
 
+        // for (let i = 0; i < features.length; i++) {
+        //     let feature = features[i];
+        //     let geometry = feature.geometry;
+        //     let properties = feature.properties;
+        //     let countyFIP = properties.COUNTYFP10;
+        //     let countyName = properties.NAMELSAD10;
 
-    for (let i = 0; i < features.length; i++) {
-        let feature = features[i];
-        let properties = feature.properties;
-        let countyFIP = properties.COUNTYFP10;
-        let countyName = properties.NAMELSAD10;
-        let lat = properties.INTPTLAT10;
-        let lng = properties.INTPTLON10;
+        //     let county = L.circle([geometry.coordinates[1], geometry.coordinates[0]], {
+        //         color: colorChange(magnitude),
+        //         fillColor: colorChange(magnitude),
+        //         fillOpacity: 0.75,
+        //         radius: markerSize(magnitude)
+        //     }).bindPopup(`<h1> Magnitude: ${magnitude}</h1><hr><h3>Location: ${property.place}</h3>`);
+        //     earthquakeMarker.addTo(earthquakeMarkers);
+            
+        // };
 
-        function countyColor(humanTrafficking) {
-            if (humanTrafficking < 1) return "#98ee00";
-            else if (humanTrafficking < 2) return "#d4ee00";
-            else if (humanTrafficking < 3) return "#eecc00";
-            else if (humanTrafficking < 4) return "#ee9c00";
-            else if (humanTrafficking < 5) return "#ea822c";
-            else return "#ea2c2c";
-        };
-
-        let count = L.choropleth
-    }
-    countyLine.addTo(myMap);
-}) 
-
-let legend = L.control({position: "bottomright"});
-// Then add all the details for the legend
-legend.onAdd = function() {
-let div = L.DomUtil.create("div", "info legend");
-
-const traffickingCount = [0, 1, 2, 3, 4, 5];
-const colors = [
-  "#98ee00",
-  "#d4ee00",
-  "#eecc00",
-  "#ee9c00",
-  "#ea822c",
-  "#ea2c2c"
-];
-for (let i = 0; i < traffickingCount.length; i++) {
-    console.log(colors[i]);
-    div.innerHTML +=
-        "<i style='background: " + colors[i] + "'></i> " +
-        magnitudes[i] + (traffickingCount[i + 1] ? "&ndash;" + traffickingCount[i + 1] + "<br>" : "+");
-    }
-    return div;
+    });
+    console.log(countyLines); 
 };
-
-// Finally, we our legend to the map.
-legend.addTo(myMap);
-
-
+dataLoad();
 
 
 const baseMaps = {
@@ -81,14 +50,12 @@ const baseMaps = {
     Satellite: satellite
 };
 const overlayMaps = {
-    Human_Trafficking: countyLines
+    Human_Trafficking: countyLines 
 };
-
 
 // Pass our map layers into our layer control.
 // Add the layer control to the map.
 L.control.layers(baseMaps, overlayMaps, {
     collapsed: false
 }).addTo(myMap); // We use the addTo() method to add objects to our map.
-
 
