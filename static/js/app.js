@@ -74,8 +74,6 @@ for (let i = 0; i < traffickingCount.length; i++) {
 legend.addTo(myMap);
 
 
-
-
 const baseMaps = {
     Street: street,
     Satellite: satellite
